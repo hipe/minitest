@@ -546,7 +546,11 @@ module MiniTest
         end
 
         opts.on '-s', '--seed SEED', Integer, "Sets random seed" do |m|
-          options[:seed] = m.to_i
+          if m == 0
+            options[:random] = false
+          else
+            options[:seed] = m
+          end
         end
 
         opts.on '-v', '--verbose', "Verbose. Show progress processing files." do
@@ -574,13 +578,19 @@ module MiniTest
       filter = options[:filter] || '/./'
       filter = Regexp.new $1 if filter and filter =~ /\/(.*)\//
 
-      seed = options[:seed]
-      unless seed then
-        srand
-        seed = srand % 0xFFFF
+      seed =
+      if false == options[:random]
+        def TestCase.test_order; :sorted end
+        0
+      else
+        seed = options[:seed]
+        unless seed then
+          srand
+          seed = srand % 0xFFFF
+        end
+        srand seed
+        seed
       end
-
-      srand seed
 
       @@out.puts "Loaded suite #{$0.sub(/\.rb$/, '')}\nStarted"
 
