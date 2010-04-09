@@ -32,6 +32,8 @@ describe MiniTest::Spec do
                         must_be_within_delta
                         must_be_within_epsilon
                         must_equal
+                        must_equal_array
+                        must_equal_string
                         must_include
                         must_match
                         must_raise

@@ -477,6 +477,68 @@ class TestMiniTestTestCase < MiniTest::Unit::TestCase
     end
   end
 
+  def test_assert_equal_array
+    @tc.assert_equal_array( ['a','b'], ['a','b'] )
+  end
+
+  def test_assert_equal_array_triggered
+    util_assert_triggered(<<-HERE.gsub(/^      /,'').chomp
+      Arrays were not equal. Diff:
+      ---
+      - - !ruby/object:Diff::LCS::Change
+          action: "-"
+          element: foo
+          position: 0
+        - !ruby/object:Diff::LCS::Change
+          action: "-"
+          element: bar
+          position: 1
+      - - !ruby/object:Diff::LCS::Change
+          action: +
+          element: dazz
+          position: 1
+        - !ruby/object:Diff::LCS::Change
+          action: +
+          element: eew
+          position: 2
+      .
+    HERE
+    ) do
+      @tc.assert_equal_array( ['foo','bar','baz'], ['baz','dazz','eew'] )
+    end
+  end
+
+  def test_assert_equal_string
+    @tc.assert_equal_string('foo', 'foo')
+  end
+
+  def test_assert_equal_string_triggered
+    util_assert_triggered(<<-HERE.gsub(/^      /,'').chomp
+      Strings were not equal. Diff:
+      ---
+      - - !ruby/object:Diff::LCS::Change
+          action: "-"
+          element: foo
+          position: 0
+        - !ruby/object:Diff::LCS::Change
+          action: "-"
+          element: bar
+          position: 1
+      - - !ruby/object:Diff::LCS::Change
+          action: +
+          element: dazz
+          position: 1
+        - !ruby/object:Diff::LCS::Change
+          action: +
+          element: eew
+          position: 2
+      .
+    HERE
+    ) do
+      @tc.assert_equal_string('foo bar baz', 'baz dazz eew')
+    end
+  end
+
   def test_assert_in_delta
     @tc.assert_in_delta 0.0, 1.0 / 1000, 0.1
   end

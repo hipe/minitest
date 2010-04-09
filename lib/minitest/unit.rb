@@ -82,6 +82,52 @@ module MiniTest
     end
 
     ##
+    # Fails unless <tt>exp == act</tt> and are arrays.
+    # +act+ need not be an array but +exp+ must be
+    # If the test fails it will print a yaml diff
+    #
+
+    def assert_equal_array exp, act, msg=nil
+      msg = message(msg) do
+        require 'diff/lcs'
+        if act.kind_of? Array
+          diff = Diff::LCS.diff(exp, act)
+          my_msg = "Arrays were not equal. Diff:\n"
+          my_msg += diff.to_yaml.gsub(/ *$/,'')
+          my_msg
+        else
+          "Expected Array had %s" % [ act.class ]
+        end
+      end
+      assert(exp == act, msg)
+    end
+
+    ##
+    # Fails unless <tt>exp == act</tt> and are strings.
+    # +act+ need not be an string but +exp+ must be
+    # If the test fails it will print a yaml diff of how
+    # the strings are different (may be useful for long strings.)
+    #
+    # TODO: break on word boundaries instead?
+    #
+
+    def assert_equal_string exp, act, msg=nil
+      msg = message(msg) do
+        require 'diff/lcs'
+        if act.kind_of? String
+          left, right = [exp, act].map{|x| x.split(' ')}
+          diff = Diff::LCS.diff(left, right)
+          my_msg = "Strings were not equal. Diff:\n"
+          my_msg += diff.to_yaml.gsub(/ *$/,'')
+          my_msg
+        else
+          "Expected String had %s" % [ act.class ]
+        end
+      end
+      assert(exp == act, msg)
+    end
+
+    ##
     # Fails unless the block returns a true value.
 
     def assert_block msg = nil
@@ -355,6 +401,14 @@ module MiniTest
       }
       refute exp == act, msg
     end
+
+    ##
+    # For now, just cheat
+    #
+
+    alias_method :refute_equal_array, :refute_equal
+
+    alias_method :refute_equal_string, :refute_equal
 
     ##
     # For comparing Floats.  Fails if +exp+ is within +delta+ of +act+
